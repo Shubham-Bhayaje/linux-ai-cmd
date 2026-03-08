@@ -77,6 +77,31 @@ ai --help
 ai ask "hello, what OS am I running?"
 ```
 
+#### Adding `ai` to PATH Manually (if `ai` command is not recognized)
+
+**Option A: Using PowerShell (quick)**
+```powershell
+# Add the ai-cli folder to your PATH permanently
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";$env:USERPROFILE\ai-cli", "User")
+```
+Then open a **new terminal** and type `ai --help`.
+
+**Option B: Using Windows Settings (GUI)**
+1. Press `Win + S` and search **"Environment Variables"**
+2. Click **"Edit the system environment variables"**
+3. Click **"Environment Variables..."** button
+4. Under **User variables**, select **Path** → click **Edit**
+5. Click **New** → add: `%USERPROFILE%\ai-cli`
+6. Click **OK** on all dialogs
+7. Open a **new terminal** and type `ai --help`
+
+**Option C: Run directly without PATH**
+
+If you don't want to modify PATH, you can always run the CLI directly:
+```cmd
+python %USERPROFILE%\ai-cli\ai ask "your question here"
+```
+
 The installer will prompt you to choose between **Ollama**, **OpenAI**, or **Claude**.
 
 ## Configuration
