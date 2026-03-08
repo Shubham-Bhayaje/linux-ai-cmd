@@ -15,13 +15,18 @@ def query_claude(prompt):
         "messages": [{"role": "user", "content": prompt}]
     }
 
-    r = requests.post(
-        "https://api.anthropic.com/v1/messages",
-        headers=headers,
-        json=data
-    )
+    try:
+        r = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers=headers,
+            json=data,
+            timeout=300
+        )
 
-    if r.status_code == 200:
-        return r.json()["content"][0]["text"]
+        if r.status_code == 200:
+            return r.json()["content"][0]["text"]
 
-    return "Claude request failed"
+        return f"Claude request failed with status {r.status_code}: {r.text}"
+        
+    except Exception as e:
+        return f"Claude Error: {str(e)}"

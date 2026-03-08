@@ -11,7 +11,8 @@ def query_ollama(prompt):
     }
 
     try:
-        r = requests.post(OLLAMA_URL, json=payload, timeout=30)
+        # Increased timeout to 5 minutes (300s) because local CPU inference is slow
+        r = requests.post(OLLAMA_URL, json=payload, timeout=300)
         
         if r.status_code == 200:
             return r.json()["response"]
