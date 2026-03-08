@@ -41,11 +41,40 @@ curl -sL https://raw.githubusercontent.com/Shubham-Bhayaje/linux-ai-cmd/main/ins
 
 ### Windows
 
-1. Make sure Python 3 and Git are installed
-2. Download or clone this repo
-3. Run:
+#### Prerequisites
+
+1. **Install Python 3.8+** from [python.org/downloads](https://www.python.org/downloads/)
+   - ⚠️ During installation, check **"Add Python to PATH"** — this is critical!
+   - To verify: open Command Prompt and run `python --version`
+
+2. **Install Git** from [git-scm.com](https://git-scm.com/)
+   - To verify: open Command Prompt and run `git --version`
+
+#### Step-by-Step Setup
+
+**Step 1:** Open **Command Prompt** or **PowerShell** and clone the repo:
 ```cmd
+git clone https://github.com/Shubham-Bhayaje/linux-ai-cmd.git %USERPROFILE%\ai-cli
+```
+
+**Step 2:** Run the installer:
+```cmd
+cd %USERPROFILE%\ai-cli
 install.bat
+```
+
+**Step 3:** The installer will:
+- ✅ Install Python dependencies (`requests`, `rich`, `typer`)
+- ✅ Ask you to choose an AI provider (Ollama / OpenAI / Claude)
+- ✅ Save your API key in `%USERPROFILE%\.ai-cli\config.py`
+- ✅ Add the `ai` command to your PATH
+
+**Step 4:** **Open a new terminal** (important — PATH changes need a fresh window)
+
+**Step 5:** Verify it works:
+```cmd
+ai --help
+ai ask "hello, what OS am I running?"
 ```
 
 The installer will prompt you to choose between **Ollama**, **OpenAI**, or **Claude**.
