@@ -2,15 +2,15 @@ import sys
 import typer
 from .commands import *
 
-app = typer.Typer()
+app = typer.Typer(help="AI-powered CLI assistant for system administration")
 
 
-@app.command(help="Ask AI anything about Linux")
+@app.command(help="Ask AI anything about your system")
 def ask(prompt: str):
     ask_ai(prompt)
 
 
-@app.command(help="Explain a Linux command")
+@app.command(help="Explain a command with examples")
 def explain(cmd: str):
     explain_command(cmd)
 
@@ -32,7 +32,7 @@ def fixcmd(command: str):
     fix_command_output(command)
 
 
-@app.command(help="Generate a Linux command for a task")
+@app.command(help="Generate a command for a task")
 def cmd(task: str):
     generate_command(task)
 
@@ -62,7 +62,7 @@ def disk():
     diagnose_disk()
 
 
-@app.command(help="Diagnose a systemd service")
+@app.command(help="Diagnose a service (systemd or Windows service)")
 def service(name: str):
     diagnose_service(name)
 

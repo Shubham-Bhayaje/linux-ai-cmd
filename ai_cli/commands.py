@@ -2,22 +2,15 @@ from rich import print
 from .provider_router import query_model
 from .utils import run_shell_command
 from .system_inspector import cpu_info, memory_info, disk_info, service_info
-
-
-SYSTEM_PROMPT = (
-    "You are a Linux system administration expert. "
-    "Always give Linux-specific answers using terminal commands. "
-    "Use tools like bash, apt, systemctl, grep, awk, sed, etc. "
-    "Never suggest GUI or Windows solutions. "
-    "Be concise and practical.\n\n"
-)
+from .os_detect import get_system_prompt, get_os_name
+import os
 
 
 def ask_ai(prompt):
 
     print("[green]AI thinking...[/green]\n")
 
-    response = query_model(SYSTEM_PROMPT + prompt)
+    response = query_model(get_system_prompt() + prompt)
 
     print("[cyan]AI Response:[/cyan]\n")
     print(response)
@@ -25,14 +18,16 @@ def ask_ai(prompt):
 
 def explain_command(cmd):
 
-    prompt = f"Explain this Linux command with example: {cmd}"
+    os_name = get_os_name()
+    prompt = f"Explain this {os_name} command with example: {cmd}"
 
     ask_ai(prompt)
 
 
 def fix_error(error):
 
-    prompt = f"How to fix this Linux error:\n{error}"
+    os_name = get_os_name()
+    prompt = f"How to fix this {os_name} error:\n{error}"
 
     ask_ai(prompt)
 
@@ -56,23 +51,26 @@ def fix_command_output(command):
 
 def fix_piped(data):
 
-    prompt = f"How to fix this Linux error output:\n{data}"
+    os_name = get_os_name()
+    prompt = f"How to fix this {os_name} error output:\n{data}"
 
     ask_ai(prompt)
 
 
 def generate_command(task):
 
-    prompt = f"Generate Linux command for: {task}"
+    os_name = get_os_name()
+    prompt = f"Generate a {os_name} command for: {task}"
 
     ask_ai(prompt)
 
 
 def run_generated_command(task):
 
-    prompt = f"Generate only the Linux command for: {task}"
+    os_name = get_os_name()
+    prompt = f"Generate only the {os_name} command for: {task}"
 
-    command = query_model(prompt)
+    command = query_model(get_system_prompt() + prompt)
 
     print("\nSuggested command:\n")
     print(command)
@@ -86,8 +84,6 @@ def run_generated_command(task):
         print("\nOutput:\n")
         print(output)
 
-
-import os
 
 def analyze_log(path):
 
@@ -107,7 +103,7 @@ def analyze_log(path):
             print(f"[yellow]Warning:[/yellow] The file '{path}' is empty.")
             return
 
-        prompt = f"Analyze this Linux log and suggest fix:\n{data}"
+        prompt = f"Analyze this log and suggest fix:\n{data}"
 
         ask_ai(prompt)
         

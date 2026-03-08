@@ -1,6 +1,6 @@
-# Linux AI CLI v3
+# AI CLI v4
 
-A DevOps AI troubleshooting assistant for Linux systems. Ask AI questions, explain commands, fix errors, generate commands, analyze logs, and diagnose system issues — all from the terminal.
+A cross-platform AI-powered CLI assistant for system administration. Works on **Linux** and **Windows** — automatically detects your OS and gives platform-specific answers.
 
 Supports **Ollama**, **OpenAI**, and **Claude** as AI providers.
 
@@ -8,42 +8,51 @@ Supports **Ollama**, **OpenAI**, and **Claude** as AI providers.
 
 | Command              | Description                        |
 | -------------------- | ---------------------------------- |
-| `ai ask "..."`       | Ask AI anything                    |
-| `ai explain "..."`   | Explain a Linux command            |
+| `ai ask "..."`       | Ask AI anything about your system  |
+| `ai explain "..."`   | Explain a command with examples    |
 | `ai fix "..."`       | Get help fixing an error           |
 | `ai fix -`           | Fix an error piped from `stdin`    |
 | `ai fixcmd "..."`    | Run cmd and fix if it errors       |
-| `ai cmd "..."`       | Generate a Linux command           |
+| `ai cmd "..."`       | Generate a command for a task      |
 | `ai run "..."`       | Generate and optionally run a cmd  |
 | `ai analyze <file>`  | Analyze a log file                 |
 | `ai cpu`             | Diagnose CPU usage                 |
 | `ai memory`          | Diagnose memory usage              |
 | `ai disk`            | Diagnose disk usage                |
-| `ai service <name>`  | Diagnose a systemd service         |
+| `ai service <name>`  | Diagnose a service                 |
 
 ## System Diagnostics
 
-| Command            | What it inspects     |
-| ------------------ | -------------------- |
-| `ai cpu`           | `top` + `ps`         |
-| `ai memory`        | `free` + `vmstat`    |
-| `ai disk`          | `df` + `du`          |
-| `ai service nginx` | `systemctl` + `journalctl` |
-| `ai analyze`       | Log file contents    |
+| Command            | Linux              | Windows                          |
+| ------------------ | ------------------ | -------------------------------- |
+| `ai cpu`           | `top` + `ps`       | `Get-Process` + WMI              |
+| `ai memory`        | `free` + `vmstat`   | `Get-Process` + WMI              |
+| `ai disk`          | `df` + `du`         | `Get-PSDrive` + WMI              |
+| `ai service nginx` | `systemctl` + `journalctl` | `Get-Service` + `Get-WinEvent` |
+| `ai analyze`       | Log file contents   | Log file contents                |
 
 ## Installation
 
-Run this one-line command to install (Debian/Ubuntu/WSL):
+### Linux / WSL / macOS
 
 ```bash
 curl -sL https://raw.githubusercontent.com/Shubham-Bhayaje/linux-ai-cmd/main/install.sh | bash
 ```
 
-The installer will prompt you to choose between **Ollama** (auto-installs + pulls `phi3`), **OpenAI**, or **Claude**.
+### Windows
+
+1. Make sure Python 3 and Git are installed
+2. Download or clone this repo
+3. Run:
+```cmd
+install.bat
+```
+
+The installer will prompt you to choose between **Ollama**, **OpenAI**, or **Claude**.
 
 ## Configuration
 
-Edit `ai_cli/config.py` to set your provider and API keys:
+Edit `ai_cli/config.py` (Linux: `/etc/linux-ai-cli/config.py`, Windows: `%USERPROFILE%\.ai-cli\config.py`):
 
 ```python
 PROVIDER = "ollama"   # ollama | openai | claude
@@ -56,11 +65,18 @@ CLAUDE_API_KEY = ""
 
 ## Uninstall
 
+### Linux
 ```bash
-bash uninstall.sh
+curl -sL https://raw.githubusercontent.com/Shubham-Bhayaje/linux-ai-cmd/main/uninstall.sh | bash
+```
+
+### Windows
+```cmd
+rmdir /s /q %USERPROFILE%\ai-cli
+del %USERPROFILE%\AppData\Local\Microsoft\WindowsApps\ai.bat
 ```
 
 ## Requirements
 
-- Python 3
+- Python 3.8+
 - `requests`, `rich`, `typer`
