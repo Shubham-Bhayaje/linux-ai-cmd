@@ -56,8 +56,94 @@ else
     sudo ln -sf /etc/linux-ai-cli/config.py /usr/lib/linux-ai-cli/ai_cli/config.py
     
     echo ""
-    echo "Note: Automatic Ollama setup is currently only supported via the .deb installer."
-    echo "Please edit /etc/linux-ai-cli/config.py to configure your AI provider."
+    echo "========================================"
+    echo "   Linux AI CLI — Setup Wizard v3.0"
+    echo "========================================"
+    echo ""
+    echo "Choose your AI provider:"
+    echo "  1) Ollama   — FREE, runs locally (default)"
+    echo "  2) OpenAI   — GPT-4o-mini (needs API key)"
+    echo "  3) Claude   — Claude 3 Haiku (needs API key)"
+    echo ""
+    
+    # Read from /dev/tty because stdin is piped from curl
+    read -p "Select provider [1/2/3] (default: 1): " CHOICE </dev/tty || CHOICE=1
+    CHOICE=${CHOICE:-1}
+
+    CONFIG_FILE="/etc/linux-ai-cli/config.py"
+
+    case $CHOICE in
+        1)
+            echo "Setting up Ollama (local AI)..."
+            sudo bash -c "cat > \"$CONFIG_FILE\" <<'EOF'
+PROVIDER = \"ollama\"
+MODEL = \"phi3\"
+
+OLLAMA_URL = \"http://localhost:11434/api/generate\"
+
+OPENAI_API_KEY = \"\"
+CLAUDE_API_KEY = \"\"
+EOF"
+            if ! command -v ollama >/dev/null 2>&1; then
+                echo "Installing Ollama..."
+                if curl -fsSL https://ollama.com/install.sh | sh; then
+                    echo "Ollama installed!"
+                else
+                    echo "WARNING: Ollama auto-install failed. Install it manually later."
+                fi
+            else
+                echo "Ollama already installed."
+            fi
+
+            if command -v ollama >/dev/null 2>&1; then
+                echo "Starting Ollama service..."
+                sudo systemctl start ollama 2>/dev/null || ollama serve >/dev/null 2>&1 &
+                sleep 3
+                echo "Pulling phi3 model (this may take a few minutes)..."
+                ollama pull phi3 || echo "Warning: Could not pull phi3. Run 'ollama pull phi3' manually."
+            fi
+            ;;
+        2)
+            echo ""
+            read -p "Enter your OpenAI API key: " OPENAI_KEY </dev/tty || OPENAI_KEY=""
+            sudo bash -c "cat > \"$CONFIG_FILE\" <<EOF
+PROVIDER = \"openai\"
+MODEL = \"gpt-4o-mini\"
+
+OLLAMA_URL = \"http://localhost:11434/api/generate\"
+
+OPENAI_API_KEY = \"$OPENAI_KEY\"
+CLAUDE_API_KEY = \"\"
+EOF"
+            echo "OpenAI configured!"
+            ;;
+        3)
+            echo ""
+            read -p "Enter your Claude API key: " CLAUDE_KEY </dev/tty || CLAUDE_KEY=""
+            sudo bash -c "cat > \"$CONFIG_FILE\" <<EOF
+PROVIDER = \"claude\"
+MODEL = \"claude-3-haiku-20240307\"
+
+OLLAMA_URL = \"http://localhost:11434/api/generate\"
+
+OPENAI_API_KEY = \"\"
+CLAUDE_API_KEY = \"$CLAUDE_KEY\"
+EOF"
+            echo "Claude configured!"
+            ;;
+        *)
+            echo "Invalid choice. Defaulting to Ollama configuration."
+            sudo bash -c "cat > \"$CONFIG_FILE\" <<'EOF'
+PROVIDER = \"ollama\"
+MODEL = \"phi3\"
+
+OLLAMA_URL = \"http://localhost:11434/api/generate\"
+
+OPENAI_API_KEY = \"\"
+CLAUDE_API_KEY = \"\"
+EOF"
+            ;;
+    esac
 fi
 
 # Cleanup
