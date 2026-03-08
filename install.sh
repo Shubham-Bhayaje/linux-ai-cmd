@@ -63,15 +63,30 @@ else
     echo "   Linux AI CLI — Setup Wizard v3.0"
     echo "========================================"
     echo ""
+    
+    TOTAL_RAM_KB=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+    LOW_RAM=false
+    DEFAULT_CHOICE=1
+
     echo "Choose your AI provider:"
-    echo "  1) Ollama   — FREE, runs locally (default)"
+    if [ "$TOTAL_RAM_KB" -lt 3500000 ]; then
+        LOW_RAM=true
+        DEFAULT_CHOICE=2
+        echo "  1) Ollama   — [WARNING: Your system has <3.5GB RAM. Ollama will likely crash!]"
+    else
+        echo "  1) Ollama   — FREE, runs locally"
+    fi
+
     echo "  2) OpenAI   — GPT-4o-mini (needs API key)"
+    if [ "$LOW_RAM" = true ]; then
+        echo "     → Recommended for your system (<3.5GB RAM)"
+    fi
     echo "  3) Claude   — Claude 3 Haiku (needs API key)"
     echo ""
     
     # Read from /dev/tty because stdin is piped from curl
-    read -p "Select provider [1/2/3] (default: 1): " CHOICE </dev/tty || CHOICE=1
-    CHOICE=${CHOICE:-1}
+    read -p "Select provider [1/2/3] (default: $DEFAULT_CHOICE): " CHOICE </dev/tty || CHOICE=$DEFAULT_CHOICE
+    CHOICE=${CHOICE:-$DEFAULT_CHOICE}
 
     CONFIG_FILE="/etc/linux-ai-cli/config.py"
 
