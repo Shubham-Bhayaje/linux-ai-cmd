@@ -52,7 +52,10 @@ else
     sudo ln -sf /usr/lib/linux-ai-cli/ai /usr/local/bin/ai
 
     sudo mkdir -p /etc/linux-ai-cli
-    sudo cp /usr/lib/linux-ai-cli/ai_cli/config.py /etc/linux-ai-cli/config.py
+    if [ ! -f /etc/linux-ai-cli/config.py ]; then
+        sudo cp /usr/lib/linux-ai-cli/ai_cli/config.py /etc/linux-ai-cli/config.py
+    fi
+    sudo rm -f /usr/lib/linux-ai-cli/ai_cli/config.py
     sudo ln -sf /etc/linux-ai-cli/config.py /usr/lib/linux-ai-cli/ai_cli/config.py
     
     echo ""
