@@ -1,0 +1,14 @@
+Package: linux-ai-cli
+Version: 3.0.0
+Section: utils
+Priority: optional
+Architecture: all
+Depends: python3 (>= 3.8), python3-pip, python3-requests, python3-rich, curl, zstd
+Maintainer: Your Name <your.email@example.com>
+Description: AI-powered Linux CLI troubleshooting assistant
+ Linux AI CLI is a DevOps AI assistant that helps diagnose
+ system issues, explain commands, fix errors, analyze logs,
+ and inspect CPU, memory, disk, and services.
+ .
+ Supports Ollama, OpenAI, and Claude as AI providers.
+Homepage: https://github.com/yourusername/linux-ai-cli

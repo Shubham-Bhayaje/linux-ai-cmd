@@ -1,0 +1,9 @@
+linux-ai-cli (3.0.0) stable; urgency=low
+
+  * v3 release with system diagnostics
+  * Added CPU, memory, disk, and service inspection
+  * Added system_inspector module
+  * Multi-provider support: Ollama, OpenAI, Claude
+  * Log analysis support
+
+ -- Your Name <your.email@example.com>  Sat, 08 Mar 2026 03:00:00 +0530

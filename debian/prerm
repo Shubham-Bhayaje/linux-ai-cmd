@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+echo "Removing Linux AI CLI..."
+
+# Remove symlink
+rm -f /usr/local/bin/ai
+
+echo "Linux AI CLI removed."
+
+exit 0

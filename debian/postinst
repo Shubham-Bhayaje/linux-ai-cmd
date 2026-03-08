@@ -1,0 +1,150 @@
+#!/bin/bash
+set -e
+
+echo ""
+echo "========================================"
+echo "   Linux AI CLI — Setup Wizard v3.0"
+echo "========================================"
+echo ""
+
+# -----------------------------------------------
+# 1. Install Python dependencies
+# -----------------------------------------------
+echo "[1/3] Installing Python dependencies..."
+pip3 install --break-system-packages requests rich typer 2>/dev/null || \
+pip3 install requests rich typer
+echo "      Done."
+echo ""
+
+# -----------------------------------------------
+# 2. Choose AI Provider
+# -----------------------------------------------
+echo "[2/3] Choose your AI provider:"
+echo ""
+echo "  1) Ollama   — FREE, runs locally (default)"
+echo "     → Installs Ollama + phi3 model"
+echo ""
+echo "  2) OpenAI   — GPT-4o-mini (needs API key)"
+echo ""
+echo "  3) Claude   — Claude 3 Haiku (needs API key)"
+echo ""
+
+read -p "Select provider [1/2/3] (default: 1): " CHOICE
+CHOICE=${CHOICE:-1}
+
+CONFIG_FILE="/etc/linux-ai-cli/config.py"
+
+case $CHOICE in
+    1)
+        echo ""
+        echo "Setting up Ollama (local AI)..."
+
+        # Write config
+        cat > "$CONFIG_FILE" <<'EOF'
+PROVIDER = "ollama"
+MODEL = "phi3"
+
+OLLAMA_URL = "http://localhost:11434/api/generate"
+
+OPENAI_API_KEY = ""
+CLAUDE_API_KEY = ""
+EOF
+
+        # Install Ollama if not present
+        if ! command -v ollama &>/dev/null; then
+            echo "Installing Ollama..."
+            # Ollama installer requires zstd
+            apt-get install -y zstd 2>/dev/null || true
+            if curl -fsSL https://ollama.com/install.sh | sh; then
+                echo "Ollama installed!"
+            else
+                echo ""
+                echo "WARNING: Ollama auto-install failed."
+                echo "Install it manually later:  curl -fsSL https://ollama.com/install.sh | sh"
+                echo ""
+            fi
+        else
+            echo "Ollama already installed."
+        fi
+
+        # Start Ollama and pull model (non-fatal)
+        if command -v ollama &>/dev/null; then
+            echo "Starting Ollama service..."
+            ollama serve &>/dev/null &
+            sleep 3
+
+            echo "Pulling phi3 model (this may take a few minutes)..."
+            ollama pull phi3 || echo "Warning: Could not pull phi3. Run 'ollama pull phi3' manually."
+
+            echo "Ollama + phi3 ready!"
+        fi
+        ;;
+
+    2)
+        echo ""
+        read -p "Enter your OpenAI API key: " OPENAI_KEY
+
+        cat > "$CONFIG_FILE" <<EOF
+PROVIDER = "openai"
+MODEL = "gpt-4o-mini"
+
+OLLAMA_URL = "http://localhost:11434/api/generate"
+
+OPENAI_API_KEY = "$OPENAI_KEY"
+CLAUDE_API_KEY = ""
+EOF
+
+        echo "OpenAI (GPT-4o-mini) configured!"
+        ;;
+
+    3)
+        echo ""
+        read -p "Enter your Claude API key: " CLAUDE_KEY
+
+        cat > "$CONFIG_FILE" <<EOF
+PROVIDER = "claude"
+MODEL = "claude-3-haiku-20240307"
+
+OLLAMA_URL = "http://localhost:11434/api/generate"
+
+OPENAI_API_KEY = ""
+CLAUDE_API_KEY = "$CLAUDE_KEY"
+EOF
+
+        echo "Claude (Haiku) configured!"
+        ;;
+
+    *)
+        echo "Invalid choice. Defaulting to Ollama."
+        ;;
+esac
+
+echo ""
+
+# -----------------------------------------------
+# 3. Create symlinks
+# -----------------------------------------------
+echo "[3/3] Finishing installation..."
+
+chmod +x /usr/lib/linux-ai-cli/ai
+ln -sf /etc/linux-ai-cli/config.py /usr/lib/linux-ai-cli/ai_cli/config.py
+ln -sf /usr/lib/linux-ai-cli/ai /usr/local/bin/ai
+
+echo ""
+echo "========================================"
+echo "   Installation complete!"
+echo "========================================"
+echo ""
+echo "  Usage:"
+echo "    ai ask \"your question\""
+echo "    ai explain \"chmod 755\""
+echo "    ai cpu"
+echo "    ai memory"
+echo "    ai disk"
+echo "    ai service nginx"
+echo ""
+echo "  Change provider later:"
+echo "    sudo nano /etc/linux-ai-cli/config.py"
+echo ""
+
+exit 0
