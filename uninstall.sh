@@ -40,6 +40,7 @@ if command -v ollama >/dev/null 2>&1; then
 
         echo "  Removing Ollama binary..."
         sudo rm -f /usr/local/bin/ollama
+        sudo rm -f /usr/bin/ollama
 
         echo "  Removing all downloaded models..."
         sudo rm -rf /usr/share/ollama
