@@ -87,14 +87,32 @@ def run_generated_command(task):
         print(output)
 
 
+import os
+
 def analyze_log(path):
 
-    with open(path) as f:
-        data = f.read()[-4000:]
+    if not os.path.exists(path):
+        print(f"[red]Error:[/red] The file '{path}' does not exist.")
+        return
+        
+    if not os.path.isfile(path):
+        print(f"[red]Error:[/red] '{path}' is a directory or special file, not a readable log file.")
+        return
 
-    prompt = f"Analyze this Linux log and suggest fix:\n{data}"
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            data = f.read()[-4000:]
+            
+        if not data.strip():
+            print(f"[yellow]Warning:[/yellow] The file '{path}' is empty.")
+            return
 
-    ask_ai(prompt)
+        prompt = f"Analyze this Linux log and suggest fix:\n{data}"
+
+        ask_ai(prompt)
+        
+    except Exception as e:
+        print(f"[red]Error reading file:[/red] {str(e)}")
 
 
 def diagnose_cpu():
