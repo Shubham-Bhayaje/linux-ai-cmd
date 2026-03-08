@@ -7,18 +7,24 @@ echo "========================================="
 
 echo "[1/4] Installing build requirements..."
 
-if command -v apt-get >/dev/null 2>&1; then
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS=$ID
+    OS_LIKE=$ID_LIKE
+else
+    OS=$(uname -s)
+fi
+
+if [[ "$OS" == *"ubuntu"* ]] || [[ "$OS" == *"debian"* ]] || [[ "$OS_LIKE" == *"debian"* ]] || [[ "$OS_LIKE" == *"ubuntu"* ]]; then
     sudo apt-get update -y >/dev/null
     sudo apt-get install -y git dpkg-dev curl zstd python3 python3-pip >/dev/null
     PKG_MGR="apt"
-elif command -v dnf >/dev/null 2>&1; then
-    sudo dnf install -y git curl zstd python3 python3-pip >/dev/null
-    PKG_MGR="dnf"
-elif command -v yum >/dev/null 2>&1; then
-    sudo yum install -y git curl zstd python3 python3-pip >/dev/null
+elif [[ "$OS" == *"amzn"* ]] || [[ "$OS" == *"centos"* ]] || [[ "$OS" == *"rhel"* ]] || [[ "$OS" == *"fedora"* ]] || [[ "$OS_LIKE" == *"rhel"* ]] || [[ "$OS_LIKE" == *"fedora"* ]] || command -v yum >/dev/null 2>&1; then
+    # Amazon Linux / RHEL family
+    sudo yum install -y git curl zstd python3 python3-pip >/dev/null 2>&1 || sudo dnf install -y git curl zstd python3 python3-pip >/dev/null 2>&1
     PKG_MGR="yum"
 else
-    echo "Unsupported package manager. Please install git, curl, zstd, and python3 manually."
+    echo "Unsupported OS or Package Manager. Please install git, curl, zstd, and python3 manually."
     exit 1
 fi
 
