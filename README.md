@@ -11,6 +11,8 @@ Supports **Ollama**, **OpenAI**, and **Claude** as AI providers.
 | `ai ask "..."`       | Ask AI anything                    |
 | `ai explain "..."`   | Explain a Linux command            |
 | `ai fix "..."`       | Get help fixing an error           |
+| `ai fix -`           | Fix an error piped from `stdin`    |
+| `ai fixcmd "..."`    | Run cmd and fix if it errors       |
 | `ai cmd "..."`       | Generate a Linux command           |
 | `ai run "..."`       | Generate and optionally run a cmd  |
 | `ai analyze <file>`  | Analyze a log file                 |
@@ -31,9 +33,13 @@ Supports **Ollama**, **OpenAI**, and **Claude** as AI providers.
 
 ## Installation
 
+Run this one-line command to install (Debian/Ubuntu/WSL):
+
 ```bash
-bash install.sh
+curl -sL https://raw.githubusercontent.com/Shubham-Bhayaje/linux-ai-cmd/main/install.sh | bash
 ```
+
+The installer will prompt you to choose between **Ollama** (auto-installs + pulls `phi3`), **OpenAI**, or **Claude**.
 
 ## Configuration
 
